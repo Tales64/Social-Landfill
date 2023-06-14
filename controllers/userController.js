@@ -1,10 +1,10 @@
-const {Thought,User} = require("./models");
+const {Thought,User} = require("../models");
 
-const userCount = async () => {
-    const numberOfUsers = await User.aggregate()
-    .count('userCount');
-  return numberOfUsers;
-}
+// const userCount = async () => {
+//     const numberOfUsers = await User.aggregate()
+//     .count('userCount');
+//   return numberOfUsers;
+// }
 
 module.exports = {
     // Get all users
@@ -84,3 +84,5 @@ module.exports = {
         }
       },
     };
+
+    
