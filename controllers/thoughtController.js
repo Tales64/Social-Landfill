@@ -1,23 +1,14 @@
 const {Thought,User} = require("../models");
 
-const userCount = async () => {
-    const numberOfUsers = await User.aggregate()
-    .count('userCount');
-  return numberOfUsers;
-}
+
 
 module.exports = {
     // Get all thoughts
     async getThoughts(req, res) {
       try {
-        const thoughts = await Thought.find();
+        const thought = await Thought.find();
   
-        const thoughtObj = {
-          thoughts,
-          headCount: await headCount(),
-        };
-  
-        res.json(thoughtObj);
+        res.json(thought);
       } catch (err) {
         console.log(err);
         return res.status(500).json(err);
@@ -123,4 +114,29 @@ module.exports = {
             res.status(500).json(err);
           }
         },
+        async deleteReaction(req, res) {
+          console.log('You are adding a thought');
+          console.log(req.body);
+      
+          try {
+            const reaction = await Thought.findOneAndUpdate(
+              { _id: req.params.thoughtId },
+              { $pull: { reaction: { _id: req.params.reactionId}}},
+              { runValidators: true, new: true }
+            );
+      
+            if (!reaction) {
+              return res
+                .status(404)
+                .json({ message: 'No reaction found with that ID :(' });
+            }
+      
+            res.json(reaction);
+          } catch (err) {
+            res.status(500).json(err);
+          }
+        },
     };
+      
+    
+

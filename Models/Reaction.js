@@ -1,48 +1,32 @@
-const { Schema, Types } = require('mongoose');
+const {Schema, model} = require('mongoose');
+const moment = require('moment');
 
-const reationSchema = new Schema(
-  {
-    reationId: {
-      type: Schema.Types.ObjectId,
-      default: () => new Types.ObjectId(),
-    },
-    reationBody: {
-      type: String,
-      required: true,
-      maxlength: 280,
-    },
-    userName: {
-      type: String,
-      required: true,
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
-  },
-  {
-    toJSON: {
-      getters: true,
-    },
-  }
+const reactionSchema = new Schema(
+    {
+        reationId: {
+            type: Schema.Types.ObjectId,
+            default: () => new Types.ObjectId(),
+          },
+        reactionBody:{
+            type:String,
+            require:true,
+            validate:{
+                validator: value => (value.length>=1 && value.length <= 280)
+            }
+        },
+        username:{
+            type:String,
+            required:true
+        },
+        createdAt:{
+            type:Date,
+            default: Date.now(),
+            get: value => {
+                return moment(value).local().format("MMM Do YYYY, h:mm:ss a");
+            }
+        }
+    }
 );
 
-module.exports = reationSchema;
-// reactionId
-
-// Use Mongoose's ObjectId data type
-// Default value is set to a new ObjectId
-// reactionBody
-
-// String
-// Required
-// 280 character maximum
-// username
-
-// String
-// Required
-// createdAt
-
-// Date
-// Set default value to the current timestamp
-// Use a getter method to format the timestamp on query
+const Reaction = model('Rection', reactionSchema);
+module.exports = Reaction;

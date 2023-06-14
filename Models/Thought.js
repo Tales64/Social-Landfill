@@ -18,7 +18,7 @@ const thoughtSchema = new Schema(
       required: true,
       default: () => Math.floor(Math.random() * (100 - 70 + 1) + 70),
     },
-    reactions: [reactionSchema],
+    reactions: ['reactionSchema'],
   },
   {
     toJSON: {
@@ -27,23 +27,9 @@ const thoughtSchema = new Schema(
   }
 );
 
+thoughtSchema.virtual('reactionCount')
+    .get(()=>{this.reactions.length})
+
 const Thought = model('Thought', thoughtSchema);
 
 module.exports = Thought;
-// thoughtText
-
-// String
-// Required
-// Must be between 1 and 280 characters
-// createdAt
-
-// Date
-// Set default value to the current timestamp
-// Use a getter method to format the timestamp on query
-// username (The user that created this thought)
-
-// String
-// Required
-// reactions (These are like replies)
-
-// Array of nested documents created with the reactionSchema
