@@ -1,46 +1,48 @@
-const Mongoose = require('mongoose');
+const { Schema, model } = require('mongoose');
 
-const emailRegex = /^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/;
-
-const userSchema = new Mongoose.Schema(
+const userSchema = new Schema(
     {
-        username:{
-            type:String,
-            required:true,
-            unique:true,
-            trim:true
+        userName: 
+        {
+            type: String,
+            unique: true,
+            trim: true,
+            required: true,
         },
-        email:{
-            type:String,
-            required:true,
-            unique:true,
-            validate:{
-                validator: value => { 
-                    return emailRegex.test(value)
-                },
-                message: 'Invalid email address'
-            }
+        email: 
+        {
+            type: String,
+            unique: true,
+            required: true,
+            // how to match?
         },
-        thoughts:[{
-            type: Mongoose.Schema.Types.ObjectId,
-            ref: 'Thought'
-        }],
-        friends:[{
-            type: Mongoose.Schema.Types.ObjectId,
-            ref: 'User'
-        }]
+        thoughts: 
+        [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'Thought',
+            },
+        ],
+        friends:
+        [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'User',
+            },
+        ],
     },
+
     {
-        toJSON:{
-            virtuals:true
+        toJSON: {
+            virtuals: true,
         },
-        id:false
+        id: false,
     }
 );
 
-userSchema.virtual('friendCount')
-    .get(function(){return this.friends.length})
+userSchema.virtual("friendCount").get(function () {
+    return this.friends.length;
+});
 
-const User = Mongoose.model('User', userSchema)
-
+const User = model("User", userSchema);
 module.exports = User;

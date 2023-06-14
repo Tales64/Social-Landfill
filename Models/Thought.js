@@ -1,37 +1,73 @@
-const Mongoose = require('mongoose');
-const moment = require('moment');
-const reactionSchema = require('./Reaction');
+const { Schema, model, Types} = require('mongoose');
+const getTime = require("../utils/getTime");
 
-const thoughtSchema = new Mongoose.Schema(
+const reactionSchema = new Schema(
     {
-        thoughtText:{
-            type:String,
-            required:true,
-            validate:{
-                validator: value => {
-                    return value.length >=1 && value.length <=280
-                },
-                message:"thoughtText must be between 1 and 280 characters"
+        reactionId: {
+            type: Schema.Types.ObjectId,
+            default: function () { 
+                return new Types.ObjectId(); // Default value is set to a new ObjectId
             }
+        },
+        reactionbody: {
+            type: String,
+            required: true,
+            maxLength: 280
+        },
+        userName: {
+            type: String,
+            required: true
         },
         createdAt:{
-            type:Date,
-            default: Date.now(),
-            get: value => {
-                return moment(value).local().format("MMM Do YYYY, h:mm:ss a");
-            }
+            type: Date,
+            default: Date.now,
+            // Use a getter method to format the timestamp on query
+            get: (timestamp) => getTime(timestamp)
+        }
+    },
+    {
+        toJSON: {
+        virtuals: true,
         },
-        username:{
-            type:String,
-            required:true
-        },
-        reactions:[reactionSchema]
+        id: false,
     }
 );
 
-thoughtSchema.virtual('reactionCount')
-    .get(()=>{this.reactions.length})
+
+const thoughtSchema = new Schema(
+    {
+        thoughtText: 
+        {
+            type: String,
+            required: true,
+            maxLength: 280
+        },
+        createdAt: 
+        {
+            type: Date,
+            default: Date.now,
+            // getters method for date
+            get: (timestamp) => getTime(timestamp),
+        },
+        userName:{
+            type: String,
+            required: true
+        },
+        reactionList: [reactionSchema], // Array of nested documents created with the reactionSchema
+    },
     
-const Thought = Mongoose.model('Thought', thoughtSchema)
+    {
+        toJSON: {
+        virtuals: true,
+        },
+        id: false,
+    }
+);
+
+thoughtSchema.virtual("reactionCount").get(function (){
+    return this.reactionList.length;
+});
+
+const Thought = model("Thought", thoughtSchema);
 
 module.exports = Thought;
