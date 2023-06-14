@@ -1,35 +1,37 @@
-const { Schema, model} = require('mongoose');
+const Mongoose = require('mongoose');
+const moment = require('moment');
 const reactionSchema = require('./Reaction');
 
-const thoughtSchema = new Schema(
-  {
-    thoughtText: {
-      type: String,
-      required:true,
-      maxlength: 250,
-      minlength: 1,
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
-    username: {
-      type: String,
-      required: true,
-      default: () => Math.floor(Math.random() * (100 - 70 + 1) + 70),
-    },
-    reactions: ['reactionSchema'],
-  },
-  {
-    toJSON: {
-      getters: true,
-    },
-  }
+const thoughtSchema = new Mongoose.Schema(
+    {
+        thoughtText:{
+            type:String,
+            required:true,
+            validate:{
+                validator: value => {
+                    return value.length >=1 && value.length <=280
+                },
+                message:"thoughtText must be between 1 and 280 characters"
+            }
+        },
+        createdAt:{
+            type:Date,
+            default: Date.now(),
+            get: value => {
+                return moment(value).local().format("MMM Do YYYY, h:mm:ss a");
+            }
+        },
+        username:{
+            type:String,
+            required:true
+        },
+        reactions:[reactionSchema]
+    }
 );
 
 thoughtSchema.virtual('reactionCount')
     .get(()=>{this.reactions.length})
-
-const Thought = model('Thought', thoughtSchema);
+    
+const Thought = Mongoose.model('Thought', thoughtSchema)
 
 module.exports = Thought;
